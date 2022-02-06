@@ -65,12 +65,13 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             try {
-                block.hash = SHA256(JSON.stringify(block)).toString();
+                block.height = self.chain.length;
+                block.time = new Date().getTime().toString().slice(0,-3);       
                 if (self.chain.length > 0) {
                     block.previousBlockHash = self.getBlockByHeight(self.height);
                 }
+                block.hash = SHA256(JSON.stringify(block)).toString();
                 self.chain.push(block);
-                self.height = self.height + 1;
                 resolve(block);
             }
             catch (e) {
@@ -189,21 +190,6 @@ class Blockchain {
 
         });
     }
-
-
-    getStarsByWalletAddress(address) {
-        let self = this;
-        let stars = [];
-        // validate chain
-        this.validateChain().then(errors => typeof errors === 'string' ? console.log('[SUCCESS] ', errors) : errors.forEach(error => console.log('[ERROR] ', error)));
-        return new Promise(async (resolve, reject) => {
-            let ownedBlocks = self.chain.filter(block => block.owner === address);
-            if (ownedBlocks.length === 0) reject(new Error('Address not found.'));
-            stars = ownedBlocks.map(block => JSON.parse(hex2ascii(block.body)));
-            stars ? resolve(stars) : reject(new Error('Failed to return stars.'));
-        });
-    }
-
 
     /**
      * This method will return a Promise that will resolve with the list of errors when validating the chain.
