@@ -41,11 +41,15 @@ class Block {
             // Save in auxiliary variable the current block hash
             let savedBlockHash = self.hash;
             // Recalculate the hash of the Block
-            self.hash = null;
-            let currHash = SHA256(JSON.stringify(self)).toString();
-            self.hash = savedBlockHash;
-            // Comparing if the hashes changed
-            resolve(currHash == savedBlockHash);
+            resolve(self.hash === SHA256(
+                JSON.stringify(
+                    {
+                        ...self,
+                        "hash": null
+                    }
+                )
+            ).toString());
+
         });
     }
 
