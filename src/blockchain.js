@@ -72,6 +72,12 @@ class Blockchain {
                 }
                 block.hash = SHA256(JSON.stringify(block)).toString();
                 self.chain.push(block);
+
+                await self.validateChain().then(function (errors) {
+                    if (errors  && errors.length > 0) {
+                        reject(Error('Could not add the block to the chain: invalid chain'));
+                    }
+                });
                 resolve(block);
             }
             catch (e) {
